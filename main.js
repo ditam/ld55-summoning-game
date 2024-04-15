@@ -133,8 +133,46 @@ function validateSpell() {
   }
 }
 
+function toggleBook() {
+  $('#handbook-container').toggleClass('open closed');
+}
+
+let currentPage = 0;
+function generateBook() {
+  const container = $('#handbook-container');
+  const book = $('<div>').addClass('book').appendTo(container);
+  const backButton = $('<div>').addClass('button back').text('<-').appendTo(book);
+  backButton.on('click', ()=>{
+    currentPage = Math.max(currentPage-1, 0);
+    $('.book .page').addClass('hidden');
+    $('.book .page').eq(currentPage).removeClass('hidden');
+  });
+  const forwardButton = $('<div>').addClass('button forward').text('->').appendTo(book);
+  forwardButton.on('click', ()=>{
+    currentPage = Math.min(currentPage+1, entries.length-1);
+    $('.book .page').addClass('hidden');
+    $('.book .page').eq(currentPage).removeClass('hidden');
+  });
+
+  const pages = $('<div>').addClass('pages').appendTo(book);
+  entries.forEach(e => {
+    const page = $('<div>').addClass('page hidden');
+    $('<div>').addClass('header').text(e.name).appendTo(page);
+    $('<div>').addClass('img-container').appendTo(page);
+    $('<div>').addClass('grid-container').text(JSON.stringify(e.grid)).appendTo(page);
+    $('<div>').addClass('phrase-container').text(e.words).appendTo(page);
+    page.appendTo(pages);
+  });
+
+  // show first page
+  $('.book .page').eq(currentPage).removeClass('hidden');
+
+  book.appendTo(container);
+}
+
 $(document).ready(function() {
   resetGrid();
+  generateBook();
 
   $('.row .cell').on('click', function() {
     const _cell = $(this);
@@ -156,6 +194,24 @@ $(document).ready(function() {
     console.log('clear');
     resetGrid();
     $('.row .cell').removeClass('selected');
+  });
+
+  $('#book-button').on('click', function() {
+    console.log('toggle book');
+    toggleBook();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.isComposing || event.keyCode === 229) {
+      return;
+    }
+
+    // It seems like we can't catch Tabs on keyup after the browser handles it
+    if (event.key === 'Tab') {
+      toggleBook();
+      event.stopPropagation();
+      event.preventDefault();
+    }
   });
 
   document.addEventListener('keyup', (event) => {

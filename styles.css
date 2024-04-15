@@ -2,6 +2,41 @@ body {
   background-color: #eee;
   font-size: 36px;
   user-select: none;
+
+  padding-left: 75px;
+}
+
+#handbook-container {
+  position: absolute;
+  overflow: hidden; /* needed for page sliding */
+  top: 100px;
+  width: 400px;
+  height: 600px;
+  border: 2px solid black;
+  background-color: gray;
+
+  transition: left 0.35s;
+}
+
+#handbook-container.closed {
+  left: -350px;
+}
+
+#handbook-container.open {
+  left: 10px;
+}
+
+#handbook-container .book .page {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  left: 0;
+
+  transition: left 0.1s;
+}
+
+#handbook-container .book .page.hidden {
+  left: 400px; /* should match container width */
 }
 
 #clear-button {
@@ -10,6 +45,13 @@ body {
   top: 400px;
   cursor: pointer;
   color: rgb(106, 20, 20);
+}
+
+#book-button {
+  position: absolute;
+  left: 100px;
+  top: 440px;
+  cursor: pointer;
 }
 
 #grid {
