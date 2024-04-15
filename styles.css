@@ -1,12 +1,33 @@
 body {
   background-color: #eee;
+  font-size: 36px;
+  user-select: none;
 }
 
-canvas {
-  background-color: white;
-  border: 1px solid gray;
+#clear-button {
+  position: absolute;
+  left: 100px;
+  top: 400px;
+  cursor: pointer;
+  color: rgb(106, 20, 20);
+}
+
+#grid {
+  position: absolute;
+  left: 200px;
+  top: 200px;
+}
+
+#grid .row .cell {
+  display: inline-block;
+  cursor: pointer;
+}
+
+#grid .row .cell.selected {
+  background-color: black;
 }
 
 #debug-log {
   font-family: monospace;
+  white-space: pre-line;
 }

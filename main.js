@@ -1,161 +1,70 @@
 
-const WIDTH = 800;
-const HEIGHT = 500;
-
-let ctx;
 let DEBUG = location && location.hostname==='localhost';
 
-let gesture;
+const grid = [];
 
-function drawFrame(timestamp) {
-  ctx.clearRect(0, 0, WIDTH, HEIGHT);
-
-  if (isDrawing) {
-    const start = gesture.history[0];
-    const end = gesture.history[gesture.history.length -1];
-    if (!gesture.direction) {
-      ctx.fillRect(start.x, start.y, 5, 5);
-    } else {
-      ctx.beginPath();
-      ctx.moveTo(start.x, start.y);
-      let targetX, targetY;
-      let xDiff = end.x - start.x; // will be positive
-      let yDiff = end.y - start.y; // will be negative
-      let diff = Math.max(Math.abs(xDiff), Math.abs(yDiff));
-
-      switch(gesture.direction) {
-        case '0-': // up
-        case '0+': // down
-          // no horizontal: lock X to start
-          targetX = start.x;
-          targetY = end.y;
-          break;
-        case '+-': // up-right
-          targetX = start.x + diff;
-          targetY = start.y - diff;
-          break;
-        case '-+': // down-left
-          targetX = start.x - diff;
-          targetY = start.y + diff;
-          break;
-        case '+0': // right
-        case '-0': // left
-          // lock vertical: lock Y to start
-          targetX = end.x;
-          targetY = start.y;
-          break;
-        case '++': // down-right
-          targetX = start.x + diff;
-          targetY = start.y + diff;
-          break;
-        case '--': // up-left
-          targetX = start.x - diff;
-          targetY = start.y - diff;
-          break;
-        default:
-          console.error('Unknown dir:', gesture.direction);
-      }
-      ctx.lineTo(targetX, targetY);
-      ctx.stroke();
-    }
-  }
-
-  requestAnimationFrame(drawFrame);
+function deepCopy(o) {
+  return JSON.parse(JSON.stringify(o));
 }
 
-let isDrawing = false;
-function startDrawing(e) {
-  gesture = {
-    history: [],
-  };
-  isDrawing = true;
-  updateMousePos(e);
-}
+function resetGrid() {
+  grid[0] = [0, 0, 0];
+  grid[1] = [0, 0, 0];
+  grid[2] = [0, 0, 0];
 
-const DIR = {
-  '0-': '0-', // up
-  '+-': '+-', // up-right
-  '+0': '+0', // right
-  '++': '++', // down-right
-  '0+': '0+', // down
-  '-+': '-+', // down-left
-  '-0': '-0', // left
-  '--': '--', // up-left
-};
-let done = false;
-function updateMousePos(e) {
   if (DEBUG) {
-    $('#debug-log').text(`mouse x:${e.clientX} y:${e.clientY}`);
+    $('#debug-log').text(`${grid[0]}\n${grid[1]}\n${grid[2]}`);
   }
-
-  if (!isDrawing) {
-    return;
-  }
-
-  const g = gesture;
-  g.history.push({
-    x: e.clientX,
-    y: e.clientY,
-  });
-  const BUFFER_SIZE = 9;
-  if (g.history.length > BUFFER_SIZE && !done) {
-    console.log('GESTURE:');
-    const xDiffs = [];
-    const yDiffs = [];
-    for (let i=0; i<BUFFER_SIZE; i++) {
-      const a = g.history[i];
-      const b = g.history[i+1];
-      console.log(a, b, `-> dX ${b.x-a.x} dY ${b.y-a.y}`);
-      xDiffs.push(b.x - a.x);
-      yDiffs.push(b.y - a.y);
-    }
-    const xAvg = xDiffs.reduce((v, s) => v + s, 0) / xDiffs.length;
-    const yAvg = yDiffs.reduce((v, s) => v + s, 0) / yDiffs.length;
-    let _direction = '';
-    if (xAvg < 0) {
-      _direction = '-';
-    } else if (xAvg === 0) {
-      _direction = '0';
-    } else {
-      _direction = '+';
-    }
-    if (yAvg < 0) {
-      _direction += '-';
-    } else if (yAvg === 0) {
-      _direction += '0';
-    } else {
-      _direction += '+';
-    }
-    g.direction = _direction;
-    done = true;
-    console.log(`xAvg: ${xAvg}, yAvg: ${yAvg}`);
-    console.log(`dir: ${_direction}`);
-  }
-  g.x = e.clientX;
-  g.y = e.clientY;
 }
 
-function stopDrawing() {
-  isDrawing = false;
-  done = false;
+function getNextIndex(grid) {
+  let biggestSoFar = 0;
+  grid.forEach(row => {
+    row.forEach(cell => {
+      if (cell > biggestSoFar) {
+        biggestSoFar = cell;
+      }
+    })
+  });
+  return biggestSoFar + 1;
+}
+
+function removeMarker(grid, i, j) {
+  const oldVal = grid[i][j];
+  grid[i][j] = 0;
+  // each cell that was after the removed val needs to be decreased by 1
+  grid.forEach(row => {
+    row.forEach((cell, _i) => {
+      if (cell > oldVal) {
+        row[_i] = cell-1;
+      }
+    })
+  });
+  console.assert(oldVal!==0, 'Unexpected marker removal:', deepCopy(grid), i, j);
 }
 
 $(document).ready(function() {
-  console.log('Hello Canvas!');
+  resetGrid();
 
-  const canvas = document.getElementById('main-canvas');
-  $(canvas).attr('height', HEIGHT);
-  $(canvas).attr('width', WIDTH);
+  $('.row .cell').on('click', function() {
+    const _cell = $(this);
+    const j = _cell.index();
+    const i = _cell.parent('.row').index();
+    if (grid[i][j] === 0) {
+      grid[i][j] = getNextIndex(grid);
+    } else {
+      removeMarker(grid, i, j);
+    }
+    _cell.toggleClass('selected');
 
-  ctx = canvas.getContext('2d');
+    if (DEBUG) {
+      $('#debug-log').text(`${grid[0]}\n${grid[1]}\n${grid[2]}`);
+    }
+  });
 
-  ctx.fillStyle = 'red';
-  ctx.strokeStyle = 'red';
-  ctx.lineWidth = 3;
-
-  document.addEventListener('mousedown', startDrawing);
-  document.addEventListener('mousemove', updateMousePos);
-  document.addEventListener('mouseup', stopDrawing);
-
-  drawFrame();
+  $('#clear-button').on('click', function() {
+    console.log('clear');
+    resetGrid();
+    $('.row .cell').removeClass('selected');
+  });
 });
