@@ -18,7 +18,7 @@ const entries = [
       [1, 0, 3],
       [0, 0, 0]
     ],
-    words: 'sim sal bimm'
+    words: 'Sim Sal Bimm'
   },
   {
     name: 'Bat',
@@ -27,7 +27,7 @@ const entries = [
       [1, 2, 0],
       [0, 0, 3]
     ],
-    words: 'fla fla suh'
+    words: 'Fla Fla Suh'
   },
   {
     name: 'Imp',
@@ -36,7 +36,7 @@ const entries = [
       [1, 0, 4],
       [2, 0, 3]
     ],
-    words: 'Xla tum suh'
+    words: 'Xla Tum Suh'
   }
 ];
 
@@ -66,10 +66,6 @@ function resetGrid() {
   grid[0] = [0, 0, 0];
   grid[1] = [0, 0, 0];
   grid[2] = [0, 0, 0];
-
-  if (DEBUG) {
-    $('#debug-log').text(`${grid[0]}\n${grid[1]}\n${grid[2]}`);
-  }
 }
 
 function getNextIndex(grid) {
@@ -184,10 +180,6 @@ $(document).ready(function() {
       removeMarker(grid, i, j);
     }
     _cell.toggleClass('selected');
-
-    if (DEBUG) {
-      $('#debug-log').text(`${grid[0]}\n${grid[1]}\n${grid[2]}`);
-    }
   });
 
   $('#clear-button').on('click', function() {
