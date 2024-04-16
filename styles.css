@@ -238,3 +238,21 @@ img.demon {
   border: 1px solid black;
   user-select: all;
 }
+
+#splash {
+  position: absolute;
+  width: 960px;
+  height: 540px;
+  top: 0;
+  left: 0;
+  background-color: #011a28;
+  text-align: center;
+  overflow: hidden;
+  color: black;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+#splash div:first-child {
+  padding-top: 400px;
+}

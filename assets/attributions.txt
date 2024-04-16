@@ -1,0 +1,13 @@
+The audio files in this folder are licensed under various Creative Commons licenses (CC0 or CC BY 3.0), see below:
+
+hum1, hum2, hum3 based on:
+Wisdom Magic Sounds by Iwan Gabovitch http://opengameart.org/users/qubodup
+
+song is evil_chanting_bgm by teckpow on opengameart
+https://opengameart.org/users/teckpow
+
+Additional sound effects from:
+https://opengameart.org/content/atmospheric-interaction-sound-pack
+https://opengameart.org/content/spell-4-fire
+https://opengameart.org/content/page-turning-sfx-sound-effect
+https://opengameart.org/content/75-cc0-breaking-falling-hit-sfx

@@ -165,16 +165,39 @@ function validateSpell() {
     // TODO: action based on result, move to next or clear etc...
     if (match) {
       console.log(`=== SUMMONING: ${entry.name} ===`);
-      const demon = $('<img>').addClass('demon').attr(
-        'src', `assets/${entry.asset}`
-      ).appendTo($('#main-wrapper'));
-      $('#grid .cell').addClass('summoning');
+      let demon;
+      const hums = [humSound1, humSound2, humSound3];
+      const selectedHums = [
+        getRandomItem(hums),
+        getRandomItem(hums),
+        getRandomItem(hums)
+      ];
+      // immediately start playing 3 hums
+      selectedHums[0].currentTime = 0;
+      selectedHums[0].play();
+      setTimeout(function(){
+        selectedHums[1].currentTime = 0;
+        selectedHums[1].play();
+      }, 1400);
+      setTimeout(function(){
+        selectedHums[2].currentTime = 0;
+        selectedHums[2].play();
+      }, 3000);
+      // delay the summoning
+      setTimeout(function() {
+        demon = $('<img>').addClass('demon').attr(
+          'src', `assets/${entry.asset}`
+        ).appendTo($('#main-wrapper'));
+        $('#grid .cell').addClass('summoning');
+        summonSound.play();
+      }, 3000);
       setTimeout(function() {
         demon.remove();
         $('#grid .cell').removeClass('summoning');
         // check if task was completed
         if (match !== tasks[currentTask]) {
           console.log(`No match: wrong summon.`);
+          errorSound.play();
           totalAttempts++;
           score-=200;
           // TODO: play sound
@@ -199,16 +222,18 @@ function validateSpell() {
           }
         }
         clear();
-      }, 4000);
+      }, 7000);
     } else {
       console.log(`No match: wrong grid for phrase of ${entry.name}`);
+      errorSound.play();
       totalAttempts++;
       score-=50;
       // TODO: play sound
       setTimeout(clear, 500);
     }
   } else {
-    console.log('No match: wrong phrase.')
+    console.log('No match: wrong phrase.');
+    errorSound.play();
     totalAttempts++;
     score-=10;
     // TODO: play sound
@@ -218,6 +243,8 @@ function validateSpell() {
 
 function toggleBook() {
   $('#handbook-container').toggleClass('open closed');
+  bookSound.currentTime = 0;
+  bookSound.play();
 }
 
 let currentPage = 0;
@@ -229,12 +256,16 @@ function generateBook() {
     currentPage = Math.max(currentPage-1, 0);
     $('.book .page').addClass('hidden');
     $('.book .page').eq(currentPage).removeClass('hidden');
+    pageSound.currentTime = 0;
+    pageSound.play();
   });
   const forwardButton = $('<div>').addClass('button forward').text('->').appendTo(book);
   forwardButton.on('click', ()=>{
     currentPage = Math.min(currentPage+1, entries.length-1);
     $('.book .page').addClass('hidden');
     $('.book .page').eq(currentPage).removeClass('hidden');
+    pageSound.currentTime = 0;
+    pageSound.play();
   });
 
   const pages = $('<div>').addClass('pages').appendTo(book);
@@ -259,6 +290,8 @@ function generateBook() {
 
 function clear() {
   console.log('clear');
+  candleOffSound.currentTime = 0;
+  candleOffSound.play();
   resetGrid();
   currentPhrase = '';
   updatePhrase();
@@ -304,15 +337,63 @@ let startTime;
 let score = 0;
 let totalAttempts = 0;
 
-let songs;
+let songs, sounds;
+let humSound1, humSound2, humSound3;
+let errorSound, summonSound;
+let candleOnSound, candleOffSound;
+let bookSound, pageSound;
 $(document).ready(function() {
   resetGrid();
   generateBook();
   generateTasks();
 
   songs = [
-    new Audio('assets/evil_temple.ogg')
+    new Audio('assets/song.ogg')
   ];
+
+  bookSound = new Audio('assets/book.mp3');
+  pageSound = new Audio('assets/page.mp3');
+  candleOnSound = new Audio('assets/candle_on.mp3');
+  candleOnSound = new Audio('assets/candle_on.mp3');
+  candleOffSound = new Audio('assets/candle_off.mp3');
+  errorSound = new Audio('assets/error.mp3');
+  summonSound = new Audio('assets/summon.mp3');
+  humSound1 = new Audio('assets/hum1.mp3');
+  humSound2 = new Audio('assets/hum2.mp3');
+  humSound3 = new Audio('assets/hum3.mp3');
+
+  sounds = [
+    bookSound,
+    pageSound,
+    errorSound,
+    summonSound,
+    candleOnSound,
+    candleOffSound,
+    humSound1,
+    humSound2,
+    humSound3
+  ];
+
+  let audioLoadCount = 0;
+  $('#loadCountTotal').text(songs.length + sounds.length);
+  function countWhenLoaded(audioElement) {
+    audioElement.addEventListener('canplaythrough', function() {
+      audioLoadCount++;
+      $('#loadCount').text(audioLoadCount);
+    }, false);
+  }
+
+  songs.forEach(countWhenLoaded);
+  sounds.forEach(countWhenLoaded);
+
+  $('#splash').on('click', function() {
+    $('#splash').remove();
+    songs[0].play();
+    songs[0].addEventListener('ended', function() {
+      this.currentTime = 0;
+      this.play();
+    }, false);
+  });
 
   startTime = new Date();
 
@@ -322,8 +403,14 @@ $(document).ready(function() {
     const i = _cell.parent('.row').index();
     if (grid[i][j] === 0) {
       grid[i][j] = getNextIndex(grid);
+      // reset sound to allow quick repeated playing
+      candleOnSound.currentTime = 0;
+      candleOnSound.play();
     } else {
       removeMarker(grid, i, j);
+      // reset sound to allow quick repeated playing
+      candleOffSound.currentTime = 0;
+      candleOffSound.play();
     }
     _cell.toggleClass('selected');
   });
@@ -335,20 +422,9 @@ $(document).ready(function() {
     toggleBook();
   });
 
-  let musicStarted = false;
   document.addEventListener('keydown', (event) => {
     if (event.isComposing || event.keyCode === 229) {
       return;
-    }
-
-    if (!musicStarted) {
-      musicStarted = true;
-      songs[0].play();
-
-      songs[0].addEventListener('ended', function() {
-        this.currentTime = 0;
-        this.play();
-      }, false);
     }
 
     // It seems like we can't catch Tabs on keyup after the browser handles it
