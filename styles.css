@@ -79,6 +79,7 @@ body {
   height: 340px;
   left: 100px;
   top: 85px;
+  text-align: center;
 
   transition: left 0.1s;
 }
@@ -87,19 +88,34 @@ body {
   left: 600px; /* should match container width */
 }
 
+#handbook-container .page .img-container {
+  width: 64px;
+  height: 64px;
+  margin: 25px 160px;
+  filter: contrast(0);
+}
+
 #clear-button {
   position: absolute;
-  left: 100px;
-  top: 400px;
+  left: 110px;
+  top: 465px;
   cursor: pointer;
-  color: rgb(106, 20, 20);
+  color: rgb(86, 17, 17);
+}
+
+#clear-button:hover {
+  text-shadow: 1px 1px 1px #229fbf53;
 }
 
 #book-button {
   position: absolute;
-  left: 100px;
-  top: 440px;
+  left: 110px;
+  top: 495px;
   cursor: pointer;
+}
+
+#book-button:hover {
+  text-shadow: 1px 1px 1px #229fbf53;
 }
 
 #grid {

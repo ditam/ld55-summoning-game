@@ -13,6 +13,7 @@ const grid = [];
 const entries = [
   {
     name: 'Goat',
+    asset: 'goat.png',
     grid: [
       [0, 2, 0],
       [1, 0, 3],
@@ -22,6 +23,7 @@ const entries = [
   },
   {
     name: 'Bat',
+    asset: 'bat.png',
     grid: [
       [0, 0, 0],
       [1, 2, 0],
@@ -31,10 +33,51 @@ const entries = [
   },
   {
     name: 'Imp',
+    asset: 'imp.png',
     grid: [
       [0, 0, 0],
       [1, 0, 4],
       [2, 0, 3]
+    ],
+    words: 'Abr Kad Dabr'
+  },
+  {
+    name: 'Gorgoth',
+    asset: 'devil.png',
+    grid: [
+      [0, 0, 3],
+      [1, 0, 0],
+      [0, 0, 2]
+    ],
+    words: 'Xla Fla Mon'
+  },
+  {
+    name: 'Shra-mun',
+    asset: 'tentacle.png',
+    grid: [
+      [0, 3, 0],
+      [0, 2, 0],
+      [0, 1, 0]
+    ],
+    words: 'Mun Ten Tacl'
+  },
+  {
+    name: 'Kla Udd',
+    asset: 'cloud.png',
+    grid: [
+      [0, 3, 0],
+      [2, 0, 4],
+      [0, 1, 0]
+    ],
+    words: 'Ren Ren Kla'
+  },
+  {
+    name: 'Oztl Unn',
+    asset: 'evil.png',
+    grid: [
+      [0, 2, 0],
+      [4, 0, 5],
+      [1, 0, 3]
     ],
     words: 'Xla Tum Suh'
   }
@@ -44,6 +87,7 @@ const entries = [
   htPhrases = {};
   entries.forEach(e=>{
     console.assert(e.name, 'Missing entry name');
+    console.assert(e.asset, 'Missing entry asset');
     console.assert(typeof e.words === 'string' && e.words.length >= 5, 'Missing entry phrase');
     // phrase should be unique - otherwise checking logic will need updates
     console.assert(!htPhrases[e.words], 'Phrase already used:', e.words)
@@ -154,8 +198,12 @@ function generateBook() {
   entries.forEach(e => {
     const page = $('<div>').addClass('page hidden');
     $('<div>').addClass('header').text(e.name).appendTo(page);
-    $('<div>').addClass('img-container').appendTo(page);
-    $('<div>').addClass('grid-container').text(JSON.stringify(e.grid)).appendTo(page);
+    $('<div>').addClass('img-container').css(
+      'background-image', `url(assets/${e.asset})`
+    ).appendTo(page);
+    $('<div>').addClass('grid-1').text(e.grid[0].join(' ')).appendTo(page);
+    $('<div>').addClass('grid-2').text(e.grid[1].join(' ')).appendTo(page);
+    $('<div>').addClass('grid-3').text(e.grid[2].join(' ')).appendTo(page);
     $('<div>').addClass('phrase-container').text(e.words).appendTo(page);
     page.appendTo(pages);
   });
