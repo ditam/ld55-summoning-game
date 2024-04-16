@@ -182,15 +182,18 @@ function validateSpell() {
           console.log('MATCH, task completed.');
           totalAttempts++;
           score+=500;
-          if (currentTask < 6) {
+          $('#task-container .task').eq(0).remove();
+          if (currentTask < 5) {
             currentTask++;
-            $('#task-container .task').eq(0).remove();
           } else {
             console.log('END');
             const endTime = new Date();
             var timeDiff = endTime - startTime; // in ms
             timeDiff /= 1000;
             var totalSeconds = Math.round(timeDiff);
+            if (totalSeconds < 300) {
+              score += (300 - totalSeconds) * 10;
+            }
             const msg = $('<div>').addClass('msg').text(`Congratulations! Your final score is ${score} (${totalAttempts} attempts, ${totalSeconds} seconds). Thank you for playing!`);
             msg.appendTo($('#main-wrapper'));
           }
