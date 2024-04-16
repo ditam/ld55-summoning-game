@@ -226,3 +226,11 @@ img.demon {
   display: inline-block;
   margin-left: 10px;
 }
+
+.msg {
+  width: 500px;
+  height: 300px;
+  text-align: center;
+  border: 1px solid black;
+  user-select: all;
+}

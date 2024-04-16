@@ -191,7 +191,8 @@ function validateSpell() {
             var timeDiff = endTime - startTime; // in ms
             timeDiff /= 1000;
             var totalSeconds = Math.round(timeDiff);
-            $('<div>').addClass('msg').text(`Congratulations! Your final score is ${score} (${totalAttempts} attempts, ${totalSeconds} seconds). Thank you for playing!`);
+            const msg = $('<div>').addClass('msg').text(`Congratulations! Your final score is ${score} (${totalAttempts} attempts, ${totalSeconds} seconds). Thank you for playing!`);
+            msg.appendTo($('#main-wrapper'));
           }
         }
         clear();
@@ -299,10 +300,16 @@ function generateTasks() {
 let startTime;
 let score = 0;
 let totalAttempts = 0;
+
+let songs;
 $(document).ready(function() {
   resetGrid();
   generateBook();
   generateTasks();
+
+  songs = [
+    new Audio('assets/evil_temple.ogg')
+  ];
 
   startTime = new Date();
 
@@ -325,9 +332,20 @@ $(document).ready(function() {
     toggleBook();
   });
 
+  let musicStarted = false;
   document.addEventListener('keydown', (event) => {
     if (event.isComposing || event.keyCode === 229) {
       return;
+    }
+
+    if (!musicStarted) {
+      musicStarted = true;
+      songs[0].play();
+
+      songs[0].addEventListener('ended', function() {
+        this.currentTime = 0;
+        this.play();
+      }, false);
     }
 
     // It seems like we can't catch Tabs on keyup after the browser handles it
