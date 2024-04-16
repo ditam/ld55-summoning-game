@@ -164,7 +164,7 @@ function validateSpell() {
     }
     // TODO: action based on result, move to next or clear etc...
     if (match) {
-      console.log(`=== MATCH: ${entry.name} ===`);
+      console.log(`=== SUMMONING: ${entry.name} ===`);
       const demon = $('<img>').addClass('demon').attr(
         'src', `assets/${entry.asset}`
       ).appendTo($('#main-wrapper'));
@@ -172,17 +172,41 @@ function validateSpell() {
       setTimeout(function() {
         demon.remove();
         $('#grid .cell').removeClass('summoning');
-        // TODO: add to score
-        // TODO: show next task
+        // check if task was completed
+        if (match !== tasks[currentTask]) {
+          console.log(`No match: wrong summon.`);
+          totalAttempts++;
+          score-=200;
+          // TODO: play sound
+        } else {
+          console.log('MATCH, task completed.');
+          totalAttempts++;
+          score+=500;
+          if (currentTask < 6) {
+            currentTask++;
+            $('#task-container .task').eq(0).remove();
+          } else {
+            console.log('END');
+            const endTime = new Date();
+            var timeDiff = endTime - startTime; // in ms
+            timeDiff /= 1000;
+            var totalSeconds = Math.round(timeDiff);
+            $('<div>').addClass('msg').text(`Congratulations! Your final score is ${score} (${totalAttempts} attempts, ${totalSeconds} seconds). Thank you for playing!`);
+          }
+        }
         clear();
       }, 4000);
     } else {
       console.log(`No match: wrong grid for phrase of ${entry.name}`);
+      totalAttempts++;
+      score-=50;
       // TODO: play sound
       setTimeout(clear, 500);
     }
   } else {
     console.log('No match: wrong phrase.')
+    totalAttempts++;
+    score-=10;
     // TODO: play sound
     setTimeout(clear, 500);
   }
@@ -237,9 +261,50 @@ function clear() {
   $('.row .cell').removeClass('selected');
 }
 
+let currentTask = 0;
+const tasks = [];
+function getTaskDOM(entry) {
+  const task = $('<div>').addClass('task');
+  $('<img>').attr(
+    'src', `assets/${entry.asset}`
+  ).appendTo(task);
+  $('<div>').addClass('name').text(entry.name).appendTo(task);
+  return task;
+}
+function generateTasks() {
+  const list = $('#task-container');
+  tasks.push(entries[0]); // always start with goat
+  htDone = {
+    'Goat': true,
+  };
+  let count = 0;
+  for (let i=0; i<5; i++) { // 5 more - if you edit, make sure there's enough to choose from
+    let entry;
+    do {
+      entry = getRandomItem(entries);
+      count++;
+    } while (htDone[entry.name] || count > 1000);
+    htDone[entry.name] = true;
+    tasks.push(entry);
+  }
+  console.log(tasks);
+  console.log(`Tasks generated - took ${count} tries.`);
+
+  tasks.forEach(entry=>{
+    const taskDom = getTaskDOM(entry);
+    list.append(taskDom);
+  });
+}
+
+let startTime;
+let score = 0;
+let totalAttempts = 0;
 $(document).ready(function() {
   resetGrid();
   generateBook();
+  generateTasks();
+
+  startTime = new Date();
 
   $('.row .cell').on('click', function() {
     const _cell = $(this);

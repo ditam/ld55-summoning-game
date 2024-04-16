@@ -188,3 +188,41 @@ img.demon {
 		opacity: 1;
 	}
 }
+
+#task-container {
+  position: absolute;
+  top: 20px;
+  left: 820px;
+  text-shadow: 1px 1px 1px #a4e3f217;
+}
+
+#task-container .task:first-child::before {
+  content: 'Current task:';
+  margin-left: -195px;
+  margin-right: 10px;
+}
+
+#task-container .task:first-child {
+  font-size: 32px;
+}
+
+#task-container .task {
+  font-size: 18px;
+}
+
+#task-container img {
+  display: inline-block;
+  filter: contrast(0);
+  width: 16px;
+  height: 16px;
+}
+
+#task-container .task:first-child img {
+  width: 32px;
+  height: 32px;
+}
+
+#task-container .name {
+  display: inline-block;
+  margin-left: 10px;
+}
