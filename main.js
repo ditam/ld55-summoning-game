@@ -165,11 +165,26 @@ function validateSpell() {
     // TODO: action based on result, move to next or clear etc...
     if (match) {
       console.log(`=== MATCH: ${entry.name} ===`);
+      const demon = $('<img>').addClass('demon').attr(
+        'src', `assets/${entry.asset}`
+      ).appendTo($('#main-wrapper'));
+      $('#grid .cell').addClass('summoning');
+      setTimeout(function() {
+        demon.remove();
+        $('#grid .cell').removeClass('summoning');
+        // TODO: add to score
+        // TODO: show next task
+        clear();
+      }, 4000);
     } else {
       console.log(`No match: wrong grid for phrase of ${entry.name}`);
+      // TODO: play sound
+      setTimeout(clear, 500);
     }
   } else {
     console.log('No match: wrong phrase.')
+    // TODO: play sound
+    setTimeout(clear, 500);
   }
 }
 
@@ -214,6 +229,14 @@ function generateBook() {
   book.appendTo(container);
 }
 
+function clear() {
+  console.log('clear');
+  resetGrid();
+  currentPhrase = '';
+  updatePhrase();
+  $('.row .cell').removeClass('selected');
+}
+
 $(document).ready(function() {
   resetGrid();
   generateBook();
@@ -230,11 +253,7 @@ $(document).ready(function() {
     _cell.toggleClass('selected');
   });
 
-  $('#clear-button').on('click', function() {
-    console.log('clear');
-    resetGrid();
-    $('.row .cell').removeClass('selected');
-  });
+  $('#clear-button').on('click', clear);
 
   $('#book-button').on('click', function() {
     console.log('toggle book');

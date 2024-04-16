@@ -160,7 +160,31 @@ body {
   background-position: center;
 }
 
+#grid .row .cell.selected.summoning {
+  background-image: url(assets/candle-lit.png);
+}
+
 #debug-log {
   font-family: monospace;
   white-space: pre-line;
+}
+
+img.demon {
+  position: absolute;
+  width: 128px;
+  height: 128px;
+  left: 425px;
+  top: 175px;
+  filter: drop-shadow(5px 25px 32px white);
+
+  animation: fadeIn 2s ease-in;
+}
+
+@keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
 }
